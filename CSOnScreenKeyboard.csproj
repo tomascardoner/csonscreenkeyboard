@@ -42,7 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\..\framework-csharp\ConstantsKeys.cs">
+    <Compile Include="..\..\framework-csharp\ConstantsKeys.cs">
       <Link>ConstantsKeys.cs</Link>
     </Compile>
     <Compile Include="OnScreenKeyboard.cs">

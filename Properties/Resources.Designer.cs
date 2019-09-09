@@ -77,5 +77,23 @@ namespace CSOnScreenKeyboard.Properties {
                 return ResourceManager.GetString("KEYTEXT_BACKSPACE_1", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ↔.
+        /// </summary>
+        internal static string KEYTEXT_CLEAR_0 {
+            get {
+                return ResourceManager.GetString("KEYTEXT_CLEAR_0", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to →.
+        /// </summary>
+        internal static string KEYTEXT_DELETE_0 {
+            get {
+                return ResourceManager.GetString("KEYTEXT_DELETE_0", resourceCulture);
+            }
+        }
     }
 }

@@ -6,6 +6,12 @@ namespace CardonerSistemas
     public partial class OnScreenKeyboard : UserControl
     {
 
+        #region Declarations
+
+        private TableLayoutPanel _panelKeyboard;
+
+        #endregion
+
         #region Layout declarations
 
         private const int KeyboardRowsAlphanumericES = 4;
@@ -24,7 +30,7 @@ namespace CardonerSistemas
         private string[,] KeyboardKeysAlphanumericES = new string[,]
         {
             { "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", ConstantsKeys.BACKSPACE },
-            { "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "DEL" },
+            { "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", ConstantsKeys.DELETE },
             { "A", "S", "D", "F", "G", "H", "J", "K", "L", "Ñ", "Ç" },
             { "Z", "X", "C", "V", "B", "N", "M", ConstantsKeys.UserDefinedSPACE, ConstantsKeys.UserDefinedSPACE, "'", "Ü" }
         };
@@ -91,28 +97,54 @@ namespace CardonerSistemas
 
         private void CreateKeyboard()
         {
-            InitializeKeyboard();
+            this.SuspendLayout();
+
+            DestroyPreviousKeyboard();
             CreatePanel();
             CreateButtons();
+
+            this.ResumeLayout();
         }
 
-        private void InitializeKeyboard()
+        private void DestroyPreviousKeyboard()
         {
-            // Clean old keyboard keys
-            foreach (Control button in panelKeyboard.Controls)
+            if (_panelKeyboard != null)
             {
-                panelKeyboard.Controls.Remove(button);
-                button.Dispose();
-            }
+                // Clean old keyboard keys
+                foreach (Control button in _panelKeyboard.Controls)
+                {
+                    _panelKeyboard.Controls.Remove(button);
+                    button.Dispose();
+                }
 
-            panelKeyboard.RowCount = 1;
-            panelKeyboard.ColumnCount = 1;
+                _panelKeyboard.Dispose();
+            }
         }
 
         private void CreatePanel()
         {
-            panelKeyboard.RowCount = _KeyboardRows;
-            panelKeyboard.ColumnCount = _KeyboardColumns;
+            _panelKeyboard = new TableLayoutPanel();
+            _panelKeyboard.Name = "panelKeyboard";
+            _panelKeyboard.Dock = DockStyle.Fill;
+            _panelKeyboard.Location = new System.Drawing.Point(0, 0);
+            _panelKeyboard.TabIndex = 0;
+            this.Controls.Add(_panelKeyboard);
+
+            // Prepare rows
+            _panelKeyboard.RowCount = _KeyboardRows;
+            Single height = Convert.ToSingle(100) / Convert.ToSingle(_KeyboardRows);
+            for (int row = 0; row < _KeyboardRows; row++)
+            {
+                _panelKeyboard.RowStyles.Add(new RowStyle(SizeType.Percent, height));
+            }
+
+            // Prepare columns
+            _panelKeyboard.ColumnCount = _KeyboardColumns;
+            Single width = Convert.ToSingle(100) / Convert.ToSingle(_KeyboardColumns);
+            for (int column = 0; column < _KeyboardColumns; column++)
+            {
+                _panelKeyboard.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, width));
+            }
         }
 
         private void CreateButtons()
@@ -129,19 +161,18 @@ namespace CardonerSistemas
                     if (previousButton != null && previousButton.Tag.ToString() == _KeyboardKeys[row, column])
                     {
                         previousColumnSpan++;
-                        panelKeyboard.SetColumnSpan(previousButton, previousColumnSpan);
+                        _panelKeyboard.SetColumnSpan(previousButton, previousColumnSpan);
                     }
                     else
                     {
                         Button button = new Button();
-                        button.Name = string.Format("{0}{1}{2}{3}{4}", KeyButtonNamePrefix, row, KeyButtonNameRowPrefix , column, KeyButtonNameColumnPrefix);
+                        button.Name = string.Format("{0}{1}{2}{3}{4}", KeyButtonNamePrefix, KeyButtonNameRowPrefix, row, KeyButtonNameColumnPrefix, column);
                         button.Text = TranslateKeyText(_KeyboardKeys[row, column]);
                         button.Tag = _KeyboardKeys[row, column];
-                        panelKeyboard.Controls.Add(button, column, row);
+                        _panelKeyboard.Controls.Add(button, column, row);
                         button.Dock = DockStyle.Fill;
                         previousButton = button;
                         previousColumnSpan = 1;
-                        panelKeyboard.SetColumnSpan(button, 1);
                     }
                 }
             }
@@ -151,8 +182,12 @@ namespace CardonerSistemas
         {
             switch (keyText)
             {
+                case ConstantsKeys.DELETE:
+                    return CSOnScreenKeyboard.Properties.Resources.KEYTEXT_DELETE_0;
                 case ConstantsKeys.BACKSPACE:
                     return CSOnScreenKeyboard.Properties.Resources.KEYTEXT_BACKSPACE_0;
+                case ConstantsKeys.UserDefinedCLEAR:
+                    return CSOnScreenKeyboard.Properties.Resources.KEYTEXT_CLEAR_0;
                 case ConstantsKeys.UserDefinedSPACE:
                     return "";
                 default:

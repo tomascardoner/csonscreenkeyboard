@@ -123,4 +123,10 @@
   <data name="KEYTEXT_BACKSPACE_1" xml:space="preserve">
     <value>⌂</value>
   </data>
+  <data name="KEYTEXT_CLEAR_0" xml:space="preserve">
+    <value>↔</value>
+  </data>
+  <data name="KEYTEXT_DELETE_0" xml:space="preserve">
+    <value>→</value>
+  </data>
 </root>
