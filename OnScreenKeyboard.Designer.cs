@@ -54,16 +54,17 @@
             this.panelKeyboard.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
             this.panelKeyboard.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
             this.panelKeyboard.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this.panelKeyboard.Size = new System.Drawing.Size(667, 294);
+            this.panelKeyboard.Size = new System.Drawing.Size(211, 208);
             this.panelKeyboard.TabIndex = 0;
             // 
-            // ControlsOnScreenKeyboardAlphanumeric
+            // OnScreenKeyboard
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.Controls.Add(this.panelKeyboard);
-            this.Name = "ControlsOnScreenKeyboardAlphanumeric";
-            this.Size = new System.Drawing.Size(667, 294);
+            this.Name = "OnScreenKeyboard";
+            this.Size = new System.Drawing.Size(211, 208);
             this.ResumeLayout(false);
 
         }

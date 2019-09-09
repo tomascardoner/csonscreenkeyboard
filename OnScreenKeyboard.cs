@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Windows.Forms;
 
 namespace CardonerSistemas
 {
@@ -68,30 +69,7 @@ namespace CardonerSistemas
             set
             {
                 _KeyboardLayout = value;
-                switch (_KeyboardLayout)
-                {
-                    case KeyboardLayoutEnums.AlphanumericSpanish:
-                        _KeyboardRows = KeyboardRowsAlphanumericES;
-                        _KeyboardColumns = KeyboardColumnsAlphanumericES;
-                        _KeyboardKeys = KeyboardKeysAlphanumericES;
-                        break;
-                    case KeyboardLayoutEnums.NumericPhone:
-                        _KeyboardRows = KeyboardRowsNumericPhone;
-                        _KeyboardColumns = KeyboardColumnsNumericPhone;
-                        _KeyboardKeys = KeyboardKeysNumericPhone;
-                        break;
-                    case KeyboardLayoutEnums.NumericCalculator:
-                        _KeyboardRows = KeyboardRowsNumericCalculator;
-                        _KeyboardColumns = KeyboardColumnsNumericCalculator;
-                        _KeyboardKeys = KeyboardKeysNumericCalculator;
-                        break;
-                    default:
-                        _KeyboardRows = 0;
-                        _KeyboardColumns = 0;
-                        _KeyboardKeys = new string[,] { { } };
-                        break;
-                }
-                CreateKeyboard();
+                KeyboardLayoutChange();
             }
         }
 
@@ -101,7 +79,7 @@ namespace CardonerSistemas
 
         #region Initialization
 
-        public ControlsOnScreenKeyboard()
+        public OnScreenKeyboard()
         {
             InitializeComponent();
             KeyboardLayout = KeyboardLayoutEnums.AlphanumericSpanish;
@@ -126,6 +104,9 @@ namespace CardonerSistemas
                 panelKeyboard.Controls.Remove(button);
                 button.Dispose();
             }
+
+            panelKeyboard.RowCount = 1;
+            panelKeyboard.ColumnCount = 1;
         }
 
         private void CreatePanel()
@@ -145,7 +126,7 @@ namespace CardonerSistemas
                 // Columns
                 for (int column = 0; column < _KeyboardColumns; column++)
                 {
-                    if (previousButton != null && previousButton.Text == _KeyboardKeys[row, column])
+                    if (previousButton != null && previousButton.Tag.ToString() == _KeyboardKeys[row, column])
                     {
                         previousColumnSpan++;
                         panelKeyboard.SetColumnSpan(previousButton, previousColumnSpan);
@@ -154,19 +135,65 @@ namespace CardonerSistemas
                     {
                         Button button = new Button();
                         button.Name = string.Format("{0}{1}{2}{3}{4}", KeyButtonNamePrefix, row, KeyButtonNameRowPrefix , column, KeyButtonNameColumnPrefix);
-                        button.Text = _KeyboardKeys[row, column];
+                        button.Text = TranslateKeyText(_KeyboardKeys[row, column]);
+                        button.Tag = _KeyboardKeys[row, column];
                         panelKeyboard.Controls.Add(button, column, row);
                         button.Dock = DockStyle.Fill;
                         previousButton = button;
                         previousColumnSpan = 1;
+                        panelKeyboard.SetColumnSpan(button, 1);
                     }
                 }
+            }
+        }
+
+        private string TranslateKeyText(string keyText)
+        {
+            switch (keyText)
+            {
+                case ConstantsKeys.BACKSPACE:
+                    return CSOnScreenKeyboard.Properties.Resources.KEYTEXT_BACKSPACE_0;
+                case ConstantsKeys.UserDefinedSPACE:
+                    return "";
+                default:
+                    return keyText;
             }
         }
 
         #endregion
 
         #region Events
+
+        public event EventHandler KeyboardLayoutChanged;
+
+        private void KeyboardLayoutChange()
+        {
+            switch (_KeyboardLayout)
+            {
+                case KeyboardLayoutEnums.AlphanumericSpanish:
+                    _KeyboardRows = KeyboardRowsAlphanumericES;
+                    _KeyboardColumns = KeyboardColumnsAlphanumericES;
+                    _KeyboardKeys = KeyboardKeysAlphanumericES;
+                    break;
+                case KeyboardLayoutEnums.NumericPhone:
+                    _KeyboardRows = KeyboardRowsNumericPhone;
+                    _KeyboardColumns = KeyboardColumnsNumericPhone;
+                    _KeyboardKeys = KeyboardKeysNumericPhone;
+                    break;
+                case KeyboardLayoutEnums.NumericCalculator:
+                    _KeyboardRows = KeyboardRowsNumericCalculator;
+                    _KeyboardColumns = KeyboardColumnsNumericCalculator;
+                    _KeyboardKeys = KeyboardKeysNumericCalculator;
+                    break;
+                default:
+                    _KeyboardRows = 0;
+                    _KeyboardColumns = 0;
+                    _KeyboardKeys = new string[,] { { } };
+                    break;
+            }
+            CreateKeyboard();
+            //this.KeyboardLayoutChanged(this, new EventArgs());
+        }
 
         private void KeyMouseUp(object sender, MouseEventArgs e)
         {
