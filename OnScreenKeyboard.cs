@@ -205,6 +205,9 @@ namespace CardonerSistemas
                         button.ForeColor = this.ForeColor;
                         button.Font = this.Font;
 
+                        // Events
+                        button.MouseUp += new System.Windows.Forms.MouseEventHandler(this.KeyMouseUp);
+
                         // Variables for key span
                         previousButton = button;
                         previousColumnSpan = 1;
@@ -262,12 +265,13 @@ namespace CardonerSistemas
                     break;
             }
             CreateKeyboard();
-            //this.KeyboardLayoutChanged(this, new EventArgs());
+            // this.KeyboardLayoutChanged(this, new EventArgs());
         }
 
         private void KeyMouseUp(object sender, MouseEventArgs e)
         {
-            ConvertButtonClickedToKeyOrder(sender as Button);
+            Button button = (Button)sender;
+            SendKeyOrder(button.Tag.ToString());
 
             if (_DestinationTextBox != null && _DestinationTextBox.Enabled && !_DestinationTextBox.ReadOnly)
             {
@@ -278,28 +282,6 @@ namespace CardonerSistemas
                 this.Parent.Focus();
             }
             this.OnClick(e);
-        }
-
-        private void ConvertButtonClickedToKeyOrder(Button buttonKey)
-        {
-            string keyNameSuffix;
-            char keyCharValue;
-
-            keyNameSuffix = buttonKey.Name.Substring(KeyButtonNamePrefix.Length);
-            switch (keyNameSuffix)
-            {
-                case ConstantsKeys.BACKSPACE:
-                    SendKeyOrder(CardonerSistemas.ConstantsKeys.BACKSPACE);
-                    break;
-
-                case ConstantsKeys.UserDefinedCLEAR:
-                    SendKeyOrder(CardonerSistemas.ConstantsKeys.UserDefinedCLEAR);
-                    break;
-
-                default:
-                    SendKeyOrder(keyNameSuffix);
-                    break;
-            }
         }
 
         private void SendKeyOrder(string keysValue)
@@ -329,7 +311,7 @@ namespace CardonerSistemas
                             }
                             break;
 
-                        case CardonerSistemas.ConstantsKeys.ESC:
+                        case CardonerSistemas.ConstantsKeys.UserDefinedCLEAR:
                             _DestinationTextBox.Text = "";
                             break;
 
