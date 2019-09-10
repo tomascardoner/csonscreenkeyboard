@@ -37,6 +37,8 @@
             this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.Name = "OnScreenKeyboard";
             this.Size = new System.Drawing.Size(211, 208);
+            this.FontChanged += new System.EventHandler(this.FontChangedEvent);
+            this.ForeColorChanged += new System.EventHandler(this.ForeColorChangedEvent);
             this.ResumeLayout(false);
 
         }

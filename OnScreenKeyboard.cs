@@ -1,4 +1,6 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace CardonerSistemas
@@ -67,8 +69,10 @@ namespace CardonerSistemas
         #region Properties
 
         private KeyboardLayoutEnums _KeyboardLayout;
-        private TextBox _DestinationTextBox;
+        private TextBox _DestinationTextBox = null;
+        private Color _KeyBackColor = SystemColors.Control;
 
+        [Description("The keyboard layout and distribution"), Category("Appearance")]
         public KeyboardLayoutEnums KeyboardLayout
         {
             get => _KeyboardLayout;
@@ -79,7 +83,27 @@ namespace CardonerSistemas
             }
         }
 
+        [Description("The textbox in wich the keys pressed appears"), Category("Data")]
         public TextBox DestinationTextBox { get => _DestinationTextBox; set => _DestinationTextBox = value; }
+
+        [Description("The background color of the keys."), Category("Appearance")]
+        public Color KeyBackColor
+        {
+            get => _KeyBackColor;
+            set
+            {
+                _KeyBackColor = value;
+
+                _panelKeyboard.SuspendLayout();
+
+                foreach (Control button in _panelKeyboard.Controls)
+                {
+                    button.BackColor = _KeyBackColor;
+                }
+
+                _panelKeyboard.ResumeLayout();
+            }
+        }
 
         #endregion
 
@@ -123,11 +147,13 @@ namespace CardonerSistemas
 
         private void CreatePanel()
         {
+            // Create the TableLayoutPanel
             _panelKeyboard = new TableLayoutPanel();
             _panelKeyboard.Name = "panelKeyboard";
             _panelKeyboard.Dock = DockStyle.Fill;
             _panelKeyboard.Location = new System.Drawing.Point(0, 0);
             _panelKeyboard.TabIndex = 0;
+            _panelKeyboard.BackColor = this.BackColor;
             this.Controls.Add(_panelKeyboard);
 
             // Prepare rows
@@ -160,17 +186,26 @@ namespace CardonerSistemas
                 {
                     if (previousButton != null && previousButton.Tag.ToString() == _KeyboardKeys[row, column])
                     {
+                        // Span adjacent equal keys
                         previousColumnSpan++;
                         _panelKeyboard.SetColumnSpan(previousButton, previousColumnSpan);
                     }
                     else
                     {
+                        // Button creation
                         Button button = new Button();
                         button.Name = string.Format("{0}{1}{2}{3}{4}", KeyButtonNamePrefix, KeyButtonNameRowPrefix, row, KeyButtonNameColumnPrefix, column);
                         button.Text = TranslateKeyText(_KeyboardKeys[row, column]);
                         button.Tag = _KeyboardKeys[row, column];
                         _panelKeyboard.Controls.Add(button, column, row);
                         button.Dock = DockStyle.Fill;
+
+                        // Appearance
+                        button.BackColor = _KeyBackColor;
+                        button.ForeColor = this.ForeColor;
+                        button.Font = this.Font;
+
+                        // Variables for key span
                         previousButton = button;
                         previousColumnSpan = 1;
                     }
@@ -307,6 +342,30 @@ namespace CardonerSistemas
                     }
                 }
             }
+        }
+
+        private void FontChangedEvent(object sender, EventArgs e)
+        {
+            _panelKeyboard.SuspendLayout();
+
+            foreach (Control button in _panelKeyboard.Controls)
+            {
+                button.Font = this.Font;
+            }
+
+            _panelKeyboard.ResumeLayout();
+        }
+
+        private void ForeColorChangedEvent(object sender, EventArgs e)
+        {
+            _panelKeyboard.SuspendLayout();
+
+            foreach (Control button in _panelKeyboard.Controls)
+            {
+                button.ForeColor = this.ForeColor;
+            }
+
+            _panelKeyboard.ResumeLayout();
         }
 
         #endregion
