@@ -16,6 +16,9 @@ namespace CardonerSistemas
 
         #region Layout declarations
 
+        private const int KeyboardRowsAlphanumericOnly = 4;
+        private const int KeyboardColumnsAlphanumericOnly = 10;
+
         private const int KeyboardRowsAlphanumericES = 4;
         private const int KeyboardColumnsAlphanumericES = 11;
 
@@ -28,6 +31,14 @@ namespace CardonerSistemas
         private const string KeyButtonNamePrefix = "buttonKey";
         private const string KeyButtonNameRowPrefix = "R";
         private const string KeyButtonNameColumnPrefix = "C";
+
+        private string[,] KeyboardKeysAlphanumericOnly = new string[,]
+        {
+            { "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" },
+            { "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P" },
+            { "A", "S", "D", "F", "G", "H", "J", "K", "L", "" },
+            { "Z", "X", "C", "V", "B", "N", "M", ConstantsKeys.UserDefinedCLEAR, ConstantsKeys.BACKSPACE, ConstantsKeys.BACKSPACE }
+        };
 
         private string[,] KeyboardKeysAlphanumericES = new string[,]
         {
@@ -55,6 +66,7 @@ namespace CardonerSistemas
 
         public enum KeyboardLayoutEnums
         {
+            AlphanumericOnly,
             AlphanumericSpanish,
             NumericPhone,
             NumericCalculator
@@ -184,33 +196,36 @@ namespace CardonerSistemas
                 // Columns
                 for (int column = 0; column < _KeyboardColumns; column++)
                 {
-                    if (previousButton != null && previousButton.Tag.ToString() == _KeyboardKeys[row, column])
+                    if (_KeyboardKeys[row, column] != "")
                     {
-                        // Span adjacent equal keys
-                        previousColumnSpan++;
-                        _panelKeyboard.SetColumnSpan(previousButton, previousColumnSpan);
-                    }
-                    else
-                    {
-                        // Button creation
-                        Button button = new Button();
-                        button.Name = string.Format("{0}{1}{2}{3}{4}", KeyButtonNamePrefix, KeyButtonNameRowPrefix, row, KeyButtonNameColumnPrefix, column);
-                        button.Text = TranslateKeyText(_KeyboardKeys[row, column]);
-                        button.Tag = _KeyboardKeys[row, column];
-                        _panelKeyboard.Controls.Add(button, column, row);
-                        button.Dock = DockStyle.Fill;
+                        if (previousButton != null && previousButton.Tag.ToString() == _KeyboardKeys[row, column])
+                        {
+                            // Span adjacent equal keys
+                            previousColumnSpan++;
+                            _panelKeyboard.SetColumnSpan(previousButton, previousColumnSpan);
+                        }
+                        else
+                        {
+                            // Button creation
+                            Button button = new Button();
+                            button.Name = string.Format("{0}{1}{2}{3}{4}", KeyButtonNamePrefix, KeyButtonNameRowPrefix, row, KeyButtonNameColumnPrefix, column);
+                            button.Text = TranslateKeyText(_KeyboardKeys[row, column]);
+                            button.Tag = _KeyboardKeys[row, column];
+                            _panelKeyboard.Controls.Add(button, column, row);
+                            button.Dock = DockStyle.Fill;
 
-                        // Appearance
-                        button.BackColor = _KeyBackColor;
-                        button.ForeColor = this.ForeColor;
-                        button.Font = this.Font;
+                            // Appearance
+                            button.BackColor = _KeyBackColor;
+                            button.ForeColor = this.ForeColor;
+                            button.Font = this.Font;
 
-                        // Events
-                        button.MouseUp += new System.Windows.Forms.MouseEventHandler(this.KeyMouseUp);
+                            // Events
+                            button.MouseUp += new System.Windows.Forms.MouseEventHandler(this.KeyMouseUp);
 
-                        // Variables for key span
-                        previousButton = button;
-                        previousColumnSpan = 1;
+                            // Variables for key span
+                            previousButton = button;
+                            previousColumnSpan = 1;
+                        }
                     }
                 }
             }
@@ -243,6 +258,11 @@ namespace CardonerSistemas
         {
             switch (_KeyboardLayout)
             {
+                case KeyboardLayoutEnums.AlphanumericOnly:
+                    _KeyboardRows = KeyboardRowsAlphanumericOnly;
+                    _KeyboardColumns = KeyboardColumnsAlphanumericOnly;
+                    _KeyboardKeys = KeyboardKeysAlphanumericOnly;
+                    break;
                 case KeyboardLayoutEnums.AlphanumericSpanish:
                     _KeyboardRows = KeyboardRowsAlphanumericES;
                     _KeyboardColumns = KeyboardColumnsAlphanumericES;
@@ -304,10 +324,24 @@ namespace CardonerSistemas
                     // textbox is disabled or in read-only mode
                     switch (keysValue)
                     {
+                        case CardonerSistemas.ConstantsKeys.UserDefinedSPACE:
+                            if (_DestinationTextBox.TextLength < _DestinationTextBox.MaxLength)
+                            {
+                                _DestinationTextBox.Text += " ";
+                            }
+                            break;
+
                         case CardonerSistemas.ConstantsKeys.BACKSPACE:
                             if (_DestinationTextBox.TextLength > 0)
                             {
                                 _DestinationTextBox.Text = _DestinationTextBox.Text.Remove(_DestinationTextBox.TextLength - 1);
+                            }
+                            break;
+
+                        case CardonerSistemas.ConstantsKeys.DELETE:
+                            if (_DestinationTextBox.TextLength > 0)
+                            {
+                                _DestinationTextBox.Text = _DestinationTextBox.Text.Remove(0, 1);
                             }
                             break;
 
